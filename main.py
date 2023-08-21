@@ -3,9 +3,8 @@ from telebot import types
 import datetime as dt
 from openpyxl import load_workbook
 
-bot = telebot.TeleBot('6063588154:AAG_bZj0zI8dyxKkP-v-FVTMNoiiijTnze0')
-admin_id = 334977381
-dev_id = 660506419
+bot = telebot.TeleBot('6584233589:AAHMVktC7Ji51ZN_LHqsjnSIss9SK9H2LcE')
+dev_id = 6584233589
 message_admin = {}
 workbook = load_workbook('messages.xlsx')
 worksheet = workbook['Sheet1']
@@ -22,31 +21,26 @@ def start(message):
     worksheet[f'D{count}'].value = message.chat.username
     
     app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    app_markup.add(types.KeyboardButton('Подать заявку ✉️'))
-    app_markup.add(types.KeyboardButton('Связаться ☎️'), types.KeyboardButton('Сообщить о проблеме 🔧'))
+    app_markup.add(types.KeyboardButton('Зарегистрироваться'))
     chat_id = message.chat.id
     first_name = message.chat.first_name
     bot.send_sticker(chat_id, sticker=r'CAACAgIAAxkBAAEImRFkO3MzP7AWT8T1uuATaNRRLJav4gACHwADWbv8Jeo5dBvZPTaZLwQ')
     bot.send_message(chat_id, f"Привет {first_name}!\n"
-                     f"Здесь вы можете отправить заявку и администратор с вами свяжется!", reply_markup=app_markup)
+                     f"Welcome to BeginIT!", reply_markup=app_markup)
     
 @bot.message_handler(content_types=["text"])
 def text(message):
     chat_id = message.chat.id
     if message.chat.type == 'private':
-        if message.text == 'Подать заявку ✉️':
+        if message.text == 'Зарегистрироваться':
             app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            app_markup.add(types.KeyboardButton('Институт'))
-            app_markup.add(types.KeyboardButton('Структура'))
-            bot.send_message(chat_id, "Кого вы представляете?👔", reply_markup=app_markup)
+            app_markup.add(types.KeyboardButton('Teacher'))
+            app_markup.add(types.KeyboardButton('Student'))
+            app_markup.add(types.KeyboardButton('Speaker'))
+
+            bot.send_message(chat_id, "Кого вы представляете?", reply_markup=app_markup)
             
             bot.register_next_step_handler(message, select_level)
-            
-        elif message.text == 'Связаться ☎️':
-            bot.send_message(chat_id, "Наши контакты: \nСанджар: https://vk.com/karimovsan\nЗам. Санджара: https://vk.com/a1exandr0va")
-        elif message.text == 'Сообщить о проблеме 🔧':
-            bot.send_message(chat_id, "Опишите проблему, связанную с работой бота ⚙️:", reply_markup=types.ReplyKeyboardRemove())
-            bot.register_next_step_handler(message, send_dev)
 
 
 def send_admin(message):
@@ -77,7 +71,7 @@ def send_admin(message):
     app_name.clear()
     app_username.clear()
     
-    bot.send_message(chat_id, "Заявка отправлена! ✅\n\nДля повторного запуска напишите /start", reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id, "Поздравляю с успешным прохождением BeginIT", reply_markup=types.ReplyKeyboardRemove())
     
 def send_dev(message):
     chat_id = message.chat.id
@@ -96,9 +90,8 @@ def select_level(message):
     
     chat_id = message.chat.id
     app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    app_markup.add(types.KeyboardButton('РТ'), types.KeyboardButton('ВУЗ'))
-    app_markup.add(types.KeyboardButton('Институт'))
-    bot.send_message(chat_id, "Уровень мероприятия 📊:", reply_markup=app_markup)
+    app_markup.add(types.KeyboardButton('Group A'), types.KeyboardButton('Group B'),  types.KeyboardButton('Group C'),  types.KeyboardButton('Group D'))
+    bot.send_message(chat_id, "Choose your group 📊:", reply_markup=app_markup)
     message_admin['level'] = message.text
     bot.register_next_step_handler(message, select_info)
 
@@ -110,9 +103,8 @@ def select_info(message):
     
     chat_id = message.chat.id
     app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    app_markup.add(types.KeyboardButton('Да'))
-    app_markup.add(types.KeyboardButton('Нет'))
-    bot.send_message(chat_id, "Есть инфосправка? 📃", reply_markup=app_markup)
+    app_markup.add(types.KeyboardButton('Help'))
+    bot.send_message(chat_id, "Задание 1. «Охота за сокровищами»\nЗадание: Исследуйте место, найдите технологические новшества. Создайте в notion фото-коллаж. \nОценка: за отправку коллажа получаете 7 кошкарчиков", reply_markup=app_markup)
     bot.register_next_step_handler(message, select_info_yn)
     message_admin['info'] = message.text
 
@@ -123,11 +115,8 @@ def select_info_yn(message):
     message_admin['info'] = message.text
     
     chat_id = message.chat.id
-    if message.text == 'Да':
-        bot.send_message(chat_id, "Замечательно!\nПрикрепите файл и отправьте нам 📁", reply_markup=types.ReplyKeyboardRemove())
-        bot.register_next_step_handler(message, select_partner)
-    elif message.text == 'Нет':
-        bot.send_message(chat_id, "Коротко распишите о своем мероприятии 📝: ", reply_markup=types.ReplyKeyboardRemove())
+    if message.text == 'Help':
+        bot.send_message(chat_id, "Ответьте на вопросы: Что нового вы увидели для себя? Что удивило? Какие выводы вы сделали для себя? Как это может повлиять на ваш выбор профессии в будущем?", reply_markup=types.ReplyKeyboardRemove())
         bot.register_next_step_handler(message, event_date)
     else:
         bot.register_next_step_handler(message, event_date)
@@ -139,7 +128,7 @@ def event_date(message):
     message_admin['short_about_event'] = message.text
     
     chat_id = message.chat.id
-    bot.send_message(chat_id, "Дата вашего мероприятия 📅: ", reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chat_id, "Ответьте через чат-бот на вопросы спикера.  ", reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(message, event_link)
 
 @bot.message_handler(content_types=["text"])
@@ -149,7 +138,9 @@ def event_link(message):
     message_admin['date'] = message.text
     
     chat_id = message.chat.id
-    bot.send_message(chat_id, "Ссылка на группу мероприятия 🔗: ", reply_markup=types.ReplyKeyboardRemove())
+    app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    app_markup.add(types.KeyboardButton('Help'))
+    bot.send_message(chat_id, "Задание 6. Провести интервью о сфере IT и профессиях будущего \nУра! Пора начать мини-исследование «5 IT профессий будущего, которые помогут спасти мир». \nОценка по 1 кошкарчику каждому приславшему в оформленный ответ через чат-бот", reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(message, event_size)
 
 @bot.message_handler(content_types=["text"])
@@ -159,8 +150,12 @@ def event_size(message):
     message_admin['link'] = message.text
     
     chat_id = message.chat.id
-    bot.send_message(chat_id, "Охват соц сетей 📱: ", reply_markup=types.ReplyKeyboardRemove())
-    bot.register_next_step_handler(message, event_count)
+    if message.text == 'Help':
+        bot.send_message(chat_id, "Спроси мнения экспертов, участников, собравшихся. Например, можно спросить: Как думаете, насколько информационные технологии будут играть роль в решении глобальных проблем? Какие технологии будут самыми востребованными через 30 лет?Как бы вы назвали эти профессии?Результаты всех наблюдений и интервью напишите, оформите в  notion и загрузите ответ через чат-бот.", reply_markup=types.ReplyKeyboardRemove())
+        bot.register_next_step_handler(message, event_date)
+    else:
+       bot.send_message(chat_id, "Ответьте через чат-бот на вопросы спикера.", reply_markup=types.ReplyKeyboardRemove())
+       bot.register_next_step_handler(message, event_count)
 
 @bot.message_handler(content_types=["text"])
 def event_count(message):
@@ -169,7 +164,11 @@ def event_count(message):
     message_admin['size'] = message.text
     
     chat_id = message.chat.id
-    bot.send_message(chat_id, "Количество участников 👨‍👨‍👧‍👧: ", reply_markup=types.ReplyKeyboardRemove())
+    app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    app_markup.add(types.KeyboardButton('Выполнить задание'))
+    app_markup.add(types.KeyboardButton('Пропустить задание'))
+    app_markup.add(types.KeyboardButton('Help'))
+    bot.send_message(chat_id, "Задание 7.Питчинг-зона \nА ты помнишь про программы No code и Digital design, которые изучали в BeginIT by inDrive? Задание выполняется по желанию. Можешь запитчить свой проект, и заработать 15 кошкарчиков ", reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(message, select_partner)
     
 @bot.message_handler(content_types=["document", "text"])
@@ -199,9 +198,8 @@ def select_partner(message):
     
     chat_id = message.chat.id
     app_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    app_markup.add(types.KeyboardButton('партнер #1'), types.KeyboardButton('партнер #2'))
-    app_markup.add(types.KeyboardButton('партнер #3'))
-    bot.send_message(chat_id, "Выберите партнёра 🤝", reply_markup=app_markup)
+    app_markup.add(types.KeyboardButton('Help'))
+    bot.send_message(chat_id, "Задание 8.Who makes inDrive app? \n Ответьте через чат-бот. \nОценка 1 кошкарчик за вопрос", reply_markup=app_markup)
     message_admin['partner'] = message.text
     bot.register_next_step_handler(message, send_admin)
 
